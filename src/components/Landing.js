@@ -6,7 +6,7 @@ const Page = styled.div`
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
   background-color: #262626;
 `;
@@ -44,7 +44,12 @@ export const authEndpoint = 'https://accounts.spotify.com/authorize';
 
 const clientId = '284a9e0c8fb64ad793066b89ec6370a5';
 const redirectUri = 'http://localhost:3000/loggedIn';
-const scopes = ['user-read-currently-playing', 'user-read-playback-state'];
+const scopes = [
+  'user-read-currently-playing',
+  'user-read-playback-state',
+  'user-top-read',
+  'user-read-recently-played'
+];
 
 export class Landing extends React.Component {
   render() {
