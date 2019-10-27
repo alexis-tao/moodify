@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import hash from '../hash';
+import axios from 'axios';
 
 const Page = styled.div`
   display: flex;
@@ -22,6 +23,19 @@ const Title = styled.div`
 export class LoggedIn extends React.Component {
   componentDidMount() {
     let token = hash.access_token;
+    if (token) {
+      axios
+        .get('https://api.spotify.com/v1/me/player/recently-played', {
+          headers: {
+            Authorization: 'Bearer ' + token
+          }
+        })
+        .then(res => {
+          console.log(res.data);
+          this.setState({ topTracks: res.data.items });
+        })
+        .catch(err => console.log(err));
+    }
   }
 
   render() {
