@@ -16,9 +16,10 @@ const Title = styled.div`
   font-size: 80px;
   font-weight: bold;
   letter-spacing: 3px;
+  margin-bottom: 30px;
 `;
 
-const LoginButton = styled.div`
+const LoginButton = styled.a`
   color: #ffffff;
   font-size: 24px;
   font-weight: bold;
@@ -30,22 +31,36 @@ const LoginButton = styled.div`
   background-color: #fc7978;
   border-radius: 30px;
   cursor: pointer;
+  text-decoration: none;
 
   &:hover,
   &:focus {
     background-color: #94ceca;
+    text-decoration: none;
   }
 `;
 
-function onClick() {
-  // spotify auth
-}
+export const authEndpoint = 'https://accounts.spotify.com/authorize';
 
-export const Landing = () => (
-  <Page>
-    <div>
-      <Title>moodify</Title>
-      <LoginButton onClick={onClick}>login</LoginButton>
-    </div>
-  </Page>
-);
+const clientId = '284a9e0c8fb64ad793066b89ec6370a5';
+const redirectUri = 'http://localhost:3000/loggedIn';
+const scopes = ['user-read-currently-playing', 'user-read-playback-state'];
+
+export class Landing extends React.Component {
+  render() {
+    return (
+      <Page>
+        <div>
+          <Title>moodify</Title>
+          <LoginButton
+            href={`${authEndpoint}?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes.join(
+              '%20'
+            )}&response_type=token&show_dialog=true`}
+          >
+            login with spotify
+          </LoginButton>
+        </div>
+      </Page>
+    );
+  }
+}
