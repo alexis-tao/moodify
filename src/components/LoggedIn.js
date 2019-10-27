@@ -8,7 +8,7 @@ const Page = styled.div`
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
   background-color: #262626;
 `;
@@ -20,7 +20,17 @@ const Title = styled.div`
   letter-spacing: 3px;
 `;
 
+const Track = styled.div`
+  color: #ffffff;
+`;
+
 export class LoggedIn extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      topTracks: []
+    };
+  }
   componentDidMount() {
     let token = hash.access_token;
     if (token) {
@@ -39,9 +49,13 @@ export class LoggedIn extends React.Component {
   }
 
   render() {
+    const { topTracks } = this.state;
     return (
       <Page>
         <Title>you're logged in!</Title>
+        {topTracks.map(item => (
+          <Track>{item.track.name}</Track>
+        ))}
       </Page>
     );
   }

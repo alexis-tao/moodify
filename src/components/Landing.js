@@ -6,7 +6,7 @@ const Page = styled.div`
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
   background-color: #262626;
 `;
