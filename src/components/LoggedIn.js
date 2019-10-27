@@ -9,7 +9,7 @@ const Page = styled.div`
   flex-direction: column;
   justify-content: space-around;
   align-items: left;
-  padding: 30px 50px;
+  padding: 0px 50px;
   min-height: 100vh;
   width: 100%;
   background-color: #262626;
@@ -38,12 +38,12 @@ export class LoggedIn extends React.Component {
   }
 
   componentDidMount() {
-    let token =
-      hash.access_token ||
-      'BQC87KcimI4x5XZp0ikuRCZDCz5fVy7pLEjdbCDBOEkQ7qBngUsC40LqwIIcVH-L-nx0UxMA_Dc91IxhGEwmXGFRFm0KzcwHtBiEFuoZj9G0w8XXGHwpg_bCktc4GcUyKkaz-3LJ1pcMg8wCRIPoNN-DL84vr68';
+    let token = hash.access_token;
 
     if (token) {
       this.setState({ token }, this.getRecentTracks);
+    } else {
+      window.location.pathname = '';
     }
   }
 
