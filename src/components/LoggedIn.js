@@ -28,33 +28,77 @@ export class LoggedIn extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      topTracks: []
+      token: {},
+      tracks: []
     };
   }
+
   componentDidMount() {
     let token = hash.access_token;
+
     if (token) {
-      axios
-        .get('https://api.spotify.com/v1/me/player/recently-played', {
-          headers: {
-            Authorization: 'Bearer ' + token
-          }
-        })
-        .then(res => {
-          console.log(res.data);
-          this.setState({ topTracks: res.data.items });
-        })
-        .catch(err => console.log(err));
+      this.setState({ token }, this.getRecentTracks);
     }
   }
 
+  getRecentTracks = () => {
+    const { token } = this.state;
+    axios
+      .get('https://api.spotify.com/v1/me/player/recently-played', {
+        headers: {
+          Authorization: 'Bearer ' + token
+        }
+      })
+      .then(res => {
+        let tracks = res.data.items
+          .map(item => item.track)
+          .reduce((acc, cur) => {
+            acc.push({ name: cur.name, id: cur.id });
+            return acc;
+          }, []);
+
+        Promise.all(
+          tracks.map(track => track.id).map(id => this.getSongEnergy(id))
+        )
+          .then(res => {
+            console.log(res);
+            tracks = tracks.reduce((acc, track, index) => {
+              acc.push({
+                ...track,
+                energy: res[index]
+              });
+              return acc;
+            }, []);
+
+            this.setState({ tracks });
+          })
+          .catch(err => console.log(err));
+      })
+      .catch(err => console.log(err));
+  };
+
+  getSongEnergy = trackId => {
+    const { token } = this.state;
+    return axios
+      .get(`https://api.spotify.com/v1/audio-features/${trackId}`, {
+        headers: {
+          Authorization: 'Bearer ' + token
+        }
+      })
+      .then(res => res.data.energy)
+      .catch(err => console.log(err));
+  };
+
   render() {
-    const { topTracks } = this.state;
+    const { tracks } = this.state;
+    console.log(tracks);
     return (
       <Page>
         <Title>you're logged in!</Title>
-        {topTracks.map(item => (
-          <Track>{item.track.name}</Track>
+        {tracks.map(track => (
+          <div>
+            <Track>{track.name}</Track>
+          </div>
         ))}
       </Page>
     );
