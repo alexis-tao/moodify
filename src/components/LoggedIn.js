@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import hash from '../hash';
 import axios from 'axios';
-import { ResponsiveLine } from '@nivo/line';
+import { ResponsiveLine, ResponsiveLineCanvas } from '@nivo/line';
 
 const Page = styled.div`
   display: flex;
@@ -50,6 +50,17 @@ export class LoggedIn extends React.Component {
 
   saveData = () => {
     //save to db
+    const user = {
+      username: this.state.userId,
+    }
+    //for testing 
+    console.log(user);
+
+    axios.post('http://localhost:5000/users',user)
+      .then(res => console.log(res.data));
+
+
+
   };
 
   getSpotifyInfo = () => {
