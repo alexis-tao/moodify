@@ -32,6 +32,7 @@ export class LoggedIn extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      userId: '',
       token: {},
       tracks: []
     };
@@ -41,11 +42,32 @@ export class LoggedIn extends React.Component {
     let token = hash.access_token;
 
     if (token) {
-      this.setState({ token }, this.getRecentTracks);
+      this.setState({ token }, this.getSpotifyInfo);
     } else {
       window.location.pathname = '';
     }
   }
+
+  saveData = () => {
+    //save to db
+  };
+
+  getSpotifyInfo = () => {
+    this.getUserId();
+    this.getRecentTracks();
+  };
+
+  getUserId = () => {
+    const { token } = this.state;
+    axios
+      .get('https://api.spotify.com/v1/me', {
+        headers: {
+          Authorization: 'Bearer ' + token
+        }
+      })
+      .then(res => this.setState({ userId: res.data.id }))
+      .catch(err => console.log(err));
+  };
 
   getRecentTracks = () => {
     const { token } = this.state;
@@ -67,7 +89,6 @@ export class LoggedIn extends React.Component {
           tracks.map(track => track.id).map(id => this.getSongEnergy(id))
         )
           .then(res => {
-            console.log(res);
             tracks = tracks.reduce((acc, track, index) => {
               acc.push({
                 ...track,
@@ -77,26 +98,32 @@ export class LoggedIn extends React.Component {
             }, []);
 
             this.setState({ tracks });
+            this.saveData();
           })
           .catch(err => console.log(err));
       })
       .catch(err => console.log(err));
   };
 
-  getSongEnergy = trackId => {
+  getSongEnergy = async trackId => {
     const { token } = this.state;
-    return axios
-      .get(`https://api.spotify.com/v1/audio-features/${trackId}`, {
-        headers: {
-          Authorization: 'Bearer ' + token
+    try {
+      const res = await axios.get(
+        `https://api.spotify.com/v1/audio-features/${trackId}`,
+        {
+          headers: {
+            Authorization: 'Bearer ' + token
+          }
         }
-      })
-      .then(res => res.data.energy)
-      .catch(err => console.log(err));
+      );
+      return res.data.energy;
+    } catch (err) {
+      return console.log(err);
+    }
   };
 
   render() {
-    const { tracks } = this.state;
+    const { tracks, userId } = this.state;
     const dataInner = tracks.reduce((acc, track) => {
       acc.push({ x: track.name, y: track.energy });
       return acc;
@@ -106,7 +133,7 @@ export class LoggedIn extends React.Component {
 
     return (
       <Page>
-        <Title>energy</Title>
+        <Title>{userId}</Title>
         <ChartWrapper>
           <ResponsiveLine
             data={data}
