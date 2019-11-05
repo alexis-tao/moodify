@@ -48,19 +48,18 @@ export class LoggedIn extends React.Component {
     }
   }
 
-  saveData = () => {
-    //save to db
-    const user = {
+  saveUserData = () => {
+    //create user 
+    const userData = {
       username: this.state.userId,
+      songTracks: this.state.tracks
     }
+
     //for testing 
-    console.log(user);
+    console.log(userData);
 
-    axios.post('http://localhost:5000/users',user)
+    axios.post('http://localhost:5000/users',userData)
       .then(res => console.log(res.data));
-
-
-
   };
 
   getSpotifyInfo = () => {
@@ -109,7 +108,7 @@ export class LoggedIn extends React.Component {
             }, []);
 
             this.setState({ tracks });
-            this.saveData();
+            this.saveUserData();
           })
           .catch(err => console.log(err));
       })
