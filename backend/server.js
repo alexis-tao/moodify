@@ -24,10 +24,8 @@ connection.once('open', () => {
   console.log("MongoDB database connection established successfully");
 })
 
-const usersRouter = require('./routes/users');
-
-app.use('/users', usersRouter);
-
+const userDataRouter = require('./routes/userData');
+app.use('/users', userDataRouter);
 
 
 app.listen(port, () => {
