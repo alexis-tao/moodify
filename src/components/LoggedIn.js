@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import hash from '../hash';
 import axios from 'axios';
-import { ResponsiveLine} from '@nivo/line';
+import { ResponsiveLine } from '@nivo/line';
 
 const Page = styled.div`
   display: flex;
@@ -49,16 +49,17 @@ export class LoggedIn extends React.Component {
   }
 
   saveUserData = () => {
-    //create user 
+    //create user
     const userData = {
       username: this.state.userId,
       songTracks: this.state.tracks
-    }
+    };
 
-    //for testing 
+    //for testing
     console.log(userData);
 
-    axios.post('http://localhost:5000/users',userData)
+    axios
+      .post('http://localhost:5000/users', userData)
       .then(res => console.log(res.data))
       .catch(err => console.log('Error: ' + err));
   };
