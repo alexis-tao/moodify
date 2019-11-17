@@ -24,7 +24,7 @@ const Title = styled.div`
 
 const ChartWrapper = styled.div`
   height: 500px;
-  width: 700px;
+  width: 80%;
   background-color: #ffffff;
 `;
 
@@ -47,7 +47,7 @@ export class LoggedIn extends React.Component {
       window.location.pathname = '';
     }
   }
-
+  
   saveUserData = () => {
     //create user
     const userData = {
@@ -81,10 +81,11 @@ export class LoggedIn extends React.Component {
       .catch(err => console.log(err));
   };
 
+  // get last 50 songs
   getRecentTracks = () => {
     const { token } = this.state;
     axios
-      .get('https://api.spotify.com/v1/me/player/recently-played', {
+      .get('https://api.spotify.com/v1/me/player/recently-played?limit=50', {
         headers: {
           Authorization: 'Bearer ' + token
         }
@@ -101,11 +102,15 @@ export class LoggedIn extends React.Component {
           tracks.map(track => track.id).map(id => this.getSongEnergy(id))
         )
           .then(res => {
-            tracks = tracks.reduce((acc, track, index) => {
-              acc.push({
-                ...track,
-                energy: res[index]
-              });
+            tracks = tracks.reduce((acc, track, index, self) => {
+              // get unique tracks only
+              if (self.map(cur => cur.id).indexOf(track.id) === index) {
+                acc.push({
+                  ...track,
+                  energy: res[index].energy,
+                  valence: res[index].valence
+                });
+              }
               return acc;
             }, []);
 
@@ -128,7 +133,7 @@ export class LoggedIn extends React.Component {
           }
         }
       );
-      return res.data.energy;
+      return res.data;
     } catch (err) {
       return console.log(err);
     }
@@ -136,12 +141,13 @@ export class LoggedIn extends React.Component {
 
   render() {
     const { tracks, userId } = this.state;
-    const dataInner = tracks.reduce((acc, track) => {
-      acc.push({ x: track.name, y: track.energy });
+
+    const valenceData = tracks.reduce((acc, track) => {
+      acc.push({ x: track.name, y: track.valence });
       return acc;
     }, []);
 
-    const data = [{ id: 'your energy', data: dataInner }];
+    const data = [{ id: 'positivity', data: valenceData }];
 
     return (
       <Page>
@@ -154,13 +160,22 @@ export class LoggedIn extends React.Component {
             yScale={{ type: 'linear', stacked: true, min: 'auto', max: 'auto' }}
             axisTop={null}
             axisRight={null}
-            axisBottom={null}
+            axisBottom={{
+              orient: 'bottom',
+              tickSize: 5,
+              tickPadding: 5,
+              tickRotation: 0,
+              legend: 'songs',
+              legendOffset: 15,
+              legendPosition: 'middle',
+              tickValues: []
+            }}
             axisLeft={{
               orient: 'left',
               tickSize: 5,
               tickPadding: 5,
               tickRotation: 0,
-              legend: 'energy',
+              legend: 'positivity',
               legendOffset: -45,
               legendPosition: 'middle'
             }}
